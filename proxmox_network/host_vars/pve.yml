@@ -1,0 +1,23 @@
+ansible_port: 22
+
+main_iface: enxa42a952efaf7
+
+vmbr0_ip_add: 192.168.0.33/24
+vmbr0_gate: 192.168.0.1
+
+vmbr1_ip_add: 10.10.10.1/24
+vmbr1_virt_net: 10.10.10.0/24
+
+dport_vm102: 2222
+to_dest_vm102: 10.10.10.102:22
+
+dport_vm103: 2233
+to_dest_vm103: 10.10.10.103:22
+
+dport_vm104: 8080
+to_dest_vm104: 10.10.10.5:8080
+
+
+
+
+

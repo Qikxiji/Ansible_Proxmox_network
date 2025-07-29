@@ -1,0 +1,40 @@
+---
+
+- name: Configure vm's
+  hosts: vms
+  become: true
+
+  handlers:
+    - name: apply config
+      command:
+        cmd: netplan apply
+
+  tasks:        
+    - name: download /etc/netplan/10-netplan-static.yaml
+      template:
+        src: templates/vm_netplan_template
+        dest: /etc/netplan/10-netplan-static.yaml
+        mode: '0600'
+      notify: apply config
+
+
+
+- name: Configure pve
+  hosts: pve
+  become: true
+
+  handlers:
+    - name: restart networking.service
+      service:
+        name: networking.service
+        state: restarted
+
+  tasks:
+    - name: download /etc/network/interfaces
+      template:
+        src: templates/pve_if_template
+        dest: /etc/network/interfaces
+        mode: '0600'
+      notify: restart networking.service
+      tags: pve
+

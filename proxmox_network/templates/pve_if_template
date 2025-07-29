@@ -1,0 +1,39 @@
+# Please do NOT modify this file directly, unless you know what you're doing.
+
+auto lo
+iface lo inet loopback
+
+iface {{ main_iface }} inet manual
+
+auto vmbr0
+iface vmbr0 inet static
+	address {{ vmbr0_ip_add }}
+	gateway {{ vmbr0_gate }}
+	bridge-ports {{ main_iface }}
+	bridge-stp off
+	bridge-fd 0
+
+#disable wi-fi iface (i configure laptop)
+iface wlp1s0 inet manual
+
+auto vmbr1
+iface vmbr1 inet static
+	address {{ vmbr1_ip_add }}
+	bridge-ports none
+	bridge-stp off
+	bridge-fd 0
+#virtual net
+post-up echo 1 > /proc/sys/net/ipv4/ip_forward
+post-up iptables -t nat -A POSTROUTING -s '{{ vmbr1_virt_net }}' -o vmbr0 -j MASQUERADE
+post-down iptables -t nat -D POSTROUTING -s '{{ vmbr1_virt_net }}' -o vmbr0 -j MASQUERADE
+
+#ssh redirect
+post-up iptables -t nat -A PREROUTING  -p tcp --dport {{ dport_vm102 }} -j DNAT --to-destination {{ to_dest_vm102 }}
+post-up iptables -t nat -A PREROUTING  -p tcp --dport {{ dport_vm103 }} -j DNAT --to-destination {{ to_dest_vm103 }}
+#post-up iptables -t nat -A PREROUTING  -p tcp --dport {{ dport_vm104 }} -j DNAT --to-destination {{ to_dest_vm104 }}
+
+post-down iptables -t nat -D PREROUTING  -p tcp --dport {{ dport_vm102 }} -j DNAT --to-destination {{ to_dest_vm102 }}
+post-down iptables -t nat -D PREROUTING  -p tcp --dport {{ dport_vm103 }} -j DNAT --to-destination {{ to_dest_vm103 }}
+#post-down iptables -t nat -D PREROUTING  -p tcp --dport {{ dport_vm104 }} -j DNAT --to-destination {{ to_dest_vm104 }}
+
+source /etc/network/interfaces.d/*

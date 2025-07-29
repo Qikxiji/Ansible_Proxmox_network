@@ -1,0 +1,13 @@
+network:
+  version: 2
+  ethernets:
+    {{ main_iface }}:
+      dhcp4: false
+      addresses:
+          - {{ ip_add }}
+      routes:
+          - to: default
+            via: {{ gateway }}
+      nameservers:
+          addresses:
+              - {{ nameserver }}
